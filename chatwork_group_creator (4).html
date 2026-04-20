@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatwork グループ作成 | Leapal</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --orange: #F07B30;
+    --orange-light: #fff4ec;
+    --orange-mid: #fde3cc;
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --text-sub: #666;
+    --text-hint: #999;
+    --border: #e8e4df;
+    --success: #2d9e6b;
+    --success-bg: #edfaf4;
+    --error: #d94f3d;
+    --error-bg: #fdf0ee;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; }
+  .logo-text { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 18px; color: var(--text); letter-spacing: -0.3px; }
+  .logo-text span { color: var(--orange); }
+  .header-sub { font-size: 13px; color: var(--text-hint); }
+  .main { max-width: 720px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--text-sub); margin-bottom: 2rem; }
+  .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+  .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--orange); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'DM Sans', sans-serif; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--card); transition: border-color 0.15s; outline: none; resize: vertical; min-height: 140px; line-height: 1.6; }
+  textarea:focus { border-color: var(--orange); }
+  textarea::placeholder { color: var(--text-hint); }
+  .parse-btn { margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: var(--orange); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: opacity 0.15s; }
+  .parse-btn:hover { opacity: 0.85; }
+  .extracted-box { margin-top: 12px; padding: 12px 14px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); display: none; }
+  .extracted-row { display: flex; align-items: baseline; gap: 10px; padding: 4px 0; }
+  .extracted-key { font-size: 12px; color: var(--text-hint); min-width: 90px; }
+  .extracted-val { font-size: 15px; font-weight: 700; color: var(--text); }
+  .extracted-group { font-size: 13px; color: var(--text-sub); }
+  .extracted-group strong { color: var(--orange); }
+  .status-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; margin-top: 10px; }
+  .status-bar.success { background: var(--success-bg); color: var(--success); }
+  .status-bar.error { background: var(--error-bg); color: var(--error); }
+  .status-bar.warning { background: #fffbe6; color: #a07800; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .success .status-dot { background: var(--success); }
+  .error .status-dot { background: var(--error); }
+  .warning .status-dot { background: #e6b800; }
+  .form-label { font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 6px; display: block; }
+  input[type="text"] { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-family: 'Noto Sans JP', sans-serif; color: var(--text); background: var(--card); transition: border-color 0.15s; outline: none; }
+  input[type="text"]:focus { border-color: var(--orange); }
+  .form-hint { font-size: 12px; color: var(--text-hint); margin-top: 6px; }
+  .members-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .members-count { font-size: 12px; color: var(--text-hint); background: var(--bg); padding: 4px 10px; border-radius: 99px; }
+  .btn-sm { font-size: 12px; padding: 6px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--card); color: var(--text-sub); cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s; }
+  .btn-sm:hover { border-color: var(--orange); color: var(--orange); }
+  .member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 480px) { .member-grid { grid-template-columns: 1fr; } }
+  .member-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; user-select: none; background: var(--card); }
+  .member-chip:hover { border-color: var(--orange-mid); background: var(--orange-light); }
+  .member-chip.on { border-color: var(--orange); background: var(--orange-light); }
+  .member-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--border); color: var(--text-sub); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .member-chip.on .member-avatar { background: var(--orange); color: white; }
+  .member-name-text { font-size: 13px; font-weight: 500; color: var(--text-sub); flex: 1; transition: color 0.15s; }
+  .member-chip.on .member-name-text { color: var(--text); }
+  .member-checkbox { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; font-size: 10px; color: transparent; }
+  .member-chip.on .member-checkbox { background: var(--orange); border-color: var(--orange); color: white; }
+  .preview-text { background: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px; color: var(--text-sub); line-height: 1.7; white-space: pre-wrap; max-height: 130px; overflow-y: auto; border: 1px solid var(--border); }
+  .fixed-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--bg); color: var(--text-hint); border: 1px solid var(--border); margin-top: 8px; }
+  .icon-row { display: flex; align-items: center; gap: 14px; }
+  .icon-circle { width: 52px; height: 52px; border-radius: 50%; background: var(--orange-light); border: 2px solid var(--orange-mid); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+  .icon-info-text { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .icon-note { font-size: 12px; color: var(--text-hint); }
+  .cta-area { margin-top: 1.5rem; display: flex; justify-content: flex-end; }
+  .btn-main { display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--orange); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; transition: opacity 0.15s, transform 0.1s; box-shadow: 0 4px 14px rgba(240,123,48,0.35); }
+  .btn-main:hover { opacity: 0.9; }
+  .btn-main:active { transform: scale(0.98); }
+  .btn-main:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .progress-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 1.5rem; margin-top: 1rem; box-shadow: var(--shadow); }
+  .progress-label { font-size: 14px; color: var(--text-sub); margin-bottom: 10px; }
+  .progress-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--orange); border-radius: 3px; transition: width 0.5s ease; }
+  .result-card { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--success); padding: 1.5rem; margin-top: 1rem; box-shadow: var(--shadow); }
+  .result-card.err { border-color: var(--error); }
+  .result-title { font-size: 15px; font-weight: 700; color: var(--success); margin-bottom: 12px; }
+  .result-card.err .result-title { color: var(--error); }
+  .result-row { font-size: 13px; color: var(--text-sub); padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+  .result-row:last-of-type { border-bottom: none; }
+  .result-key { color: var(--text-hint); min-width: 120px; }
+  .result-val { color: var(--text); font-weight: 500; }
+  .result-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; padding: 10px 18px; background: var(--orange); color: white; text-decoration: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; transition: opacity 0.15s; }
+  .result-link:hover { opacity: 0.85; }
+  .notice-box { margin-top: 12px; padding: 10px 12px; background: var(--orange-light); border-radius: var(--radius-sm); font-size: 12px; color: #a05010; border: 1px solid var(--orange-mid); }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <svg class="logo-icon" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="38" cy="38" rx="30" ry="30" fill="#F07B30"/>
+      <ellipse cx="62" cy="32" rx="26" ry="26" fill="#F07B30"/>
+      <ellipse cx="50" cy="55" rx="28" ry="24" fill="#F07B30"/>
+      <rect x="44" y="68" width="12" height="38" rx="5" fill="#F07B30"/>
+      <polygon points="50,80 44,90 56,90" fill="#d96820"/>
+      <rect x="40" y="106" width="20" height="8" rx="4" fill="#F07B30"/>
+    </svg>
+    <span class="logo-text">Lea<span>pal</span></span>
+  </div>
+  <span class="header-sub">Chatwork グループ作成ツール</span>
+</header>
+
+<main class="main">
+  <h1 class="page-title">グループを作成する</h1>
+  <p class="page-sub">見積書のテキストを貼り付けると、顧問先名と担当者を自動で読み取ります。</p>
+
+  <!-- Step 1 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">1</div>
+      <div class="card-title">見積書テキストを貼り付け</div>
+    </div>
+    <textarea id="pasteArea" placeholder="見積書ページのテキストをコピーしてここに貼り付けてください。&#10;&#10;「顧問先名」と「見積作成者」が含まれていれば自動で読み取ります。"></textarea>
+    <button class="parse-btn" onclick="parseText()">読み取る →</button>
+
+    <div class="extracted-box" id="extractedBox">
+      <div class="extracted-row">
+        <span class="extracted-key">顧問先名</span>
+        <span class="extracted-val" id="extractedClient"></span>
+      </div>
+      <div class="extracted-row">
+        <span class="extracted-key">見積作成者</span>
+        <span class="extracted-val" id="extractedCreator"></span>
+      </div>
+      <div class="extracted-row" style="margin-top:6px;">
+        <span class="extracted-key">グループ名</span>
+        <span class="extracted-group"><strong id="extractedGroupName"></strong></span>
+      </div>
+    </div>
+    <div id="parseStatus" style="display:none;"></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">2</div>
+      <div class="card-title">グループ名を確認・編集</div>
+    </div>
+    <label class="form-label">グループ名</label>
+    <input type="text" id="groupNameInput" placeholder="（テキスト読み取りで自動入力されます）">
+    <div class="form-hint">形式：○○様×Leapal</div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">3</div>
+      <div class="card-title">初期メンバーを選択（管理者として追加）</div>
+    </div>
+    <div class="members-header">
+      <button class="btn-sm" onclick="toggleAll()">全員選択 / 解除</button>
+      <span class="members-count" id="memberCount">0 / 8 名選択中</span>
+    </div>
+    <div class="member-grid" id="memberGrid"></div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">4</div>
+      <div class="card-title">初回メッセージ（自動送信）</div>
+    </div>
+    <div class="preview-text">お世話になっております。リーパル会計事務所です。
+この度は弊所とご契約いただき、ありがとうございます。
+[info][title]【リーパルからのお知らせ】グループチャット参加のお願い[/title]
+弊所からのお知らせ事項は下記グループでご案内をしております。
+https://www.chatwork.com/g/hg2t8lyp5vn51x
+こちらも併せてご参加いただきますようお願い申し上げます。[/info]
+今後ともよろしくお願いいたします。</div>
+    <span class="fixed-badge">固定テキスト・変更不可</span>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num">5</div>
+      <div class="card-title">概要欄（固定テキスト）</div>
+    </div>
+    <div class="preview-text">[info][title]弊所のサポート体制につきまして[/title]
+幣所では、サービス品質向上を目的に、複数人体制でお客様のご対応をさせていただいております。
+＜体制＞
+・ご契約内容、経営上の各種相談等：担当者が対応
+・請求書関係：リーパル管理（弊所総務担当）アカウントを通じて対応
+・月次レポート作成、決算業務：製造部門担当が対応
+★今後は月次レポート作成及び決算業務に携わるスタッフ（製造部門担当）が対応窓口となります。
+[/info]
+[info][title]リーパルからのお知らせ[/title]
+弊所からのお知らせは下記グループでご案内をしております。
+https://www.chatwork.com/g/hg2t8lyp5vn51x[/info]</div>
+    <span class="fixed-badge">固定テキスト・変更不可</span>
+  </div>
+
+  <!-- Icon -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-num" style="background:var(--border);color:var(--text-sub);">i</div>
+      <div class="card-title">グループアイコン</div>
+    </div>
+    <div class="icon-row">
+      <div class="icon-circle">
+        <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="38" cy="38" rx="30" ry="30" fill="#F07B30"/>
+          <ellipse cx="62" cy="32" rx="26" ry="26" fill="#F07B30"/>
+          <ellipse cx="50" cy="55" rx="28" ry="24" fill="#F07B30"/>
+          <rect x="44" y="68" width="12" height="38" rx="5" fill="#F07B30"/>
+          <polygon points="50,80 44,90 56,90" fill="#d96820"/>
+          <rect x="40" y="106" width="20" height="8" rx="4" fill="#F07B30"/>
+        </svg>
+      </div>
+      <div>
+        <div class="icon-info-text">Leapalロゴ（木）</div>
+        <div class="icon-note">Chatwork APIはアイコン画像のアップロード非対応のため、<br>作成後にChatworkのグループ設定から手動で設定してください。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-area">
+    <button class="btn-main" id="createBtn" disabled onclick="createGroup()">
+      グループを作成する →
+    </button>
+  </div>
+
+  <div id="resultArea"></div>
+</main>
+
+<script>
+const CHATWORK_TOKEN = "368f1532b3068b197e4744133fab7d8e";
+
+const MEMBERS = [
+  { id: 10202004, name: "角 祥平" },
+  { id: 8841067,  name: "阿部 卓磨" },
+  { id: 9689307,  name: "松倉 良平" },
+  { id: 9981012,  name: "安藤 美幸" },
+  { id: 10455638, name: "徳田 直樹" },
+  { id: 10785512, name: "土橋 美智子" },
+  { id: 11113797, name: "佐々木 雄紀" },
+  { id: 10210508, name: "大下 勇" }
+];
+
+const DESCRIPTION = `[info][title]弊所のサポート体制につきまして[/title]
+幣所では、サービス品質向上を目的に、複数人体制でお客様のご対応をさせていただいております。
+＜体制＞
+・ご契約内容、経営上の各種相談等：担当者が対応
+・請求書関係：リーパル管理（弊所総務担当）アカウントを通じて対応
+・月次レポート作成、決算業務：製造部門担当が対応
+★今後は月次レポート作成及び決算業務に携わるスタッフ（製造部門担当）が対応窓口となります。
+　製造部門のスタッフにつきましてはチャットグループ名、右側をクリックいただくとご確認いただけます。
+今後、当グループ内にて担当者以外のスタッフがご連絡をすることがございます。
+皆様におかれましては、いつも通りお気軽にご質問やご相談をいただけますと幸いでございます。
+内容に応じて各担当者が回答をいたします。[/info]
+[info][title]リーパルからのお知らせ[/title]
+弊所からのお知らせ（補助金や税制情報等の情報提供）は下記グループでご案内をしております。
+https://www.chatwork.com/g/hg2t8lyp5vn51x
+こちらも併せてご参加いただきますようお願い申し上げます。[/info]`;
+
+const WELCOME_MESSAGE = `お世話になっております。リーパル会計事務所です。
+この度は弊所とご契約いただき、ありがとうございます。
+[info][title]【リーパルからのお知らせ】グループチャット参加のお願い[/title]
+弊所からのお知らせ事項は下記グループでご案内をしております。
+https://www.chatwork.com/g/hg2t8lyp5vn51x
+こちらも併せてご参加いただきますようお願い申し上げます。[/info]
+今後ともよろしくお願いいたします。`;
+
+const selected = new Set();
+
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/);
+  return parts.length >= 2 ? parts[0][0] + parts[1][0] : name[0];
+}
+
+function renderMembers() {
+  const grid = document.getElementById('memberGrid');
+  grid.innerHTML = MEMBERS.map(m => {
+    const on = selected.has(m.id);
+    return `<div class="member-chip ${on ? 'on' : ''}" onclick="toggleMember(${m.id})">
+      <div class="member-avatar">${getInitials(m.name)}</div>
+      <div class="member-name-text">${m.name}</div>
+      <div class="member-checkbox">${on ? '✓' : ''}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('memberCount').textContent = `${selected.size} / ${MEMBERS.length} 名選択中`;
+}
+
+function toggleMember(id) {
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  renderMembers();
+}
+
+function toggleAll() {
+  selected.size === MEMBERS.length ? selected.clear() : MEMBERS.forEach(m => selected.add(m.id));
+  renderMembers();
+}
+
+renderMembers();
+
+function parseText() {
+  const text = document.getElementById('pasteArea').value;
+  if (!text.trim()) {
+    showParseStatus('テキストが入力されていません。', 'error');
+    return;
+  }
+
+  // 顧問先名：「顧問先名」ラベルの次の行、または「取引先名」ラベルの次の行から取得
+  // 優先順位：顧問先名 > 取引先名
+  let clientName = null;
+
+  const clientMatch = text.match(/顧問先名\s*[\n\r]+\s*([^\n\r]+)/);
+  if (clientMatch) {
+    clientName = clientMatch[1].trim();
+  } else {
+    const tradeMatch = text.match(/取引先名\s*[\n\r]+\s*([^\n\r]+)/);
+    if (tradeMatch) clientName = tradeMatch[1].trim();
+  }
+
+  // 見積作成者：「見積作成者」ラベルの次の行から取得
+  let creatorName = null;
+  const creatorMatch = text.match(/見積作成者\s*[\n\r]+\s*([^\n\r]+)/);
+  if (creatorMatch) creatorName = creatorMatch[1].trim();
+
+  if (!clientName) {
+    showParseStatus('顧問先名が見つかりませんでした。テキストに「顧問先名」または「取引先名」が含まれているか確認してください。', 'error');
+    return;
+  }
+
+  // 表示
+  const groupName = `${clientName}様×Leapal`;
+  document.getElementById('extractedClient').textContent = clientName;
+  document.getElementById('extractedCreator').textContent = creatorName || '（見つかりませんでした）';
+  document.getElementById('extractedGroupName').textContent = groupName;
+  document.getElementById('extractedBox').style.display = 'block';
+  document.getElementById('groupNameInput').value = groupName;
+  document.getElementById('createBtn').disabled = false;
+
+  // 見積作成者からメンバー自動選択
+  selected.clear();
+  if (creatorName) {
+    const normalized = creatorName.replace(/\s+/g, '');
+    const matched = MEMBERS.filter(m => m.name.replace(/\s+/g, '') === normalized);
+    if (matched.length > 0) {
+      matched.forEach(m => selected.add(m.id));
+      renderMembers();
+      showParseStatus(`「${clientName}」「${creatorName}」を読み取り、メンバーを自動選択しました。`, 'success');
+    } else {
+      renderMembers();
+      showParseStatus(`「${clientName}」を読み取りました。見積作成者「${creatorName}」はメンバーリストに見つかりませんでした。手動で選択してください。`, 'warning');
+    }
+  } else {
+    renderMembers();
+    showParseStatus(`「${clientName}」を読み取りました。メンバーは手動で選択してください。`, 'warning');
+  }
+}
+
+function showParseStatus(msg, type) {
+  const el = document.getElementById('parseStatus');
+  el.style.display = 'flex';
+  el.className = `status-bar ${type}`;
+  el.innerHTML = `<span class="status-dot"></span>${msg}`;
+}
+
+document.getElementById('groupNameInput').addEventListener('input', () => {
+  document.getElementById('createBtn').disabled = !document.getElementById('groupNameInput').value.trim();
+});
+
+function showProgress(pct, label) {
+  document.getElementById('resultArea').innerHTML = `
+    <div class="progress-card">
+      <div class="progress-label">${label}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+}
+
+async function createGroup() {
+  const groupName = document.getElementById('groupNameInput').value.trim();
+  if (!groupName) return;
+  const createBtn = document.getElementById('createBtn');
+  createBtn.disabled = true;
+  createBtn.textContent = '作成中...';
+  showProgress(20, 'グループを作成中...');
+
+  try {
+    const params = new URLSearchParams();
+    params.append('name', groupName);
+    params.append('description', DESCRIPTION);
+    params.append('icon_preset', 'meeting');
+    if (selected.size > 0) params.append('members_admin_ids', Array.from(selected).join(','));
+
+    const res = await fetch('https://api.chatwork.com/v2/rooms', {
+      method: 'POST',
+      headers: { 'X-ChatWorkToken': CHATWORK_TOKEN, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params
+    });
+    const data = await res.json();
+
+    if (res.ok && data.room_id) {
+      showProgress(65, 'メッセージを送信中...');
+      const msgParams = new URLSearchParams();
+      msgParams.append('body', WELCOME_MESSAGE);
+      msgParams.append('self_unread', '0');
+      const msgRes = await fetch(`https://api.chatwork.com/v2/rooms/${data.room_id}/messages`, {
+        method: 'POST',
+        headers: { 'X-ChatWorkToken': CHATWORK_TOKEN, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: msgParams
+      });
+      const msgData = await msgRes.json();
+      showProgress(100, '完了！');
+      const selectedNames = MEMBERS.filter(m => selected.has(m.id)).map(m => m.name).join('、');
+      const msgOk = msgRes.ok && msgData.message_id;
+
+      setTimeout(() => {
+        document.getElementById('resultArea').innerHTML = `
+          <div class="result-card">
+            <div class="result-title">✓ グループを作成しました</div>
+            <div class="result-row"><span class="result-key">グループ名</span><span class="result-val">${groupName}</span></div>
+            ${selectedNames ? `<div class="result-row"><span class="result-key">追加メンバー</span><span class="result-val">${selectedNames}</span></div>` : ''}
+            <div class="result-row"><span class="result-key">Room ID</span><span class="result-val">${data.room_id}</span></div>
+            <div class="result-row"><span class="result-key">初回メッセージ</span><span class="result-val" style="color:${msgOk ? 'var(--success)' : 'var(--error)'}">${msgOk ? '✓ 送信完了' : '✗ 送信失敗'}</span></div>
+            <a href="https://www.chatwork.com/#!rid${data.room_id}" class="result-link" target="_blank">Chatworkで開く →</a>
+            <div class="notice-box">📌 アイコンの変更：Chatworkのグループ設定からLeapalロゴ画像をアップロードしてください。</div>
+          </div>`;
+      }, 400);
+    } else {
+      document.getElementById('resultArea').innerHTML = `
+        <div class="result-card err">
+          <div class="result-title">✗ エラーが発生しました</div>
+          <pre style="font-size:12px;color:var(--text-sub);white-space:pre-wrap;">${JSON.stringify(data, null, 2)}</pre>
+        </div>`;
+    }
+  } catch (err) {
+    document.getElementById('resultArea').innerHTML = `
+      <div class="result-card err">
+        <div class="result-title">✗ 通信エラー</div>
+        <p style="font-size:13px;color:var(--text-sub);">${err.message}</p>
+      </div>`;
+  }
+
+  createBtn.disabled = false;
+  createBtn.textContent = 'グループを作成する →';
+}
+</script>
+</body>
+</html>
